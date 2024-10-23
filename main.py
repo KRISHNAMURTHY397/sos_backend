@@ -14,8 +14,14 @@ CORS(app)  # Enable CORS for the Flask app
 account_sid = str(environ.get("ACCOUNT_ID")  # Your Twilio Account SID
 auth_token = str(environ.get("AUTH_ID")     # Your Twilio Auth Token
 twilio_phone_number = str(environ.get("TWILIO_NUM")  # Twilio phone number
-destination_number = str(environ.get("SEND_NUM")  # The number to send the SOS
+destination_number = str(environ.get("SEND_NUM")  #The number to send the SOS
 
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+
+                         
 # Function to send SMS via Twilio
 def send_sms(location, message):
     client = Client(account_sid, auth_token)
@@ -48,5 +54,5 @@ def send_sos():
         return jsonify({'status': 'error', 'message': 'Failed to send SOS'}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=8080)
 
