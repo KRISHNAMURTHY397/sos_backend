@@ -11,10 +11,10 @@ app = Flask(__name__)
 CORS(app)  # Enable CORS for the Flask app
 
 # Twilio settings
-account_sid = str(environ.get("ACCOUNT_ID")  # Your Twilio Account SID
-auth_token = str(environ.get("AUTH_ID")     # Your Twilio Auth Token
-twilio_phone_number = str(environ.get("TWILIO_NUM")  # Twilio phone number
-destination_number = str(environ.get("SEND_NUM")  #The number to send the SOS
+account_sid = str(environ.get("ACCOUNT_ID"))  # Your Twilio Account SID
+auth_token = str(environ.get("AUTH_ID"))     # Your Twilio Auth Token
+twilio_phone_number = str(environ.get("TWILIO_NUM"))  # Twilio phone number
+destination_number = str(environ.get("SEND_NUM"))  #The number to send the SOS
 
 @app.route('/')
 def home():
