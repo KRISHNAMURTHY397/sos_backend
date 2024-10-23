@@ -53,6 +53,6 @@ def send_sos():
     else:
         return jsonify({'status': 'error', 'message': 'Failed to send SOS'}), 500
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
-
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8080))  # Default to 8080 if PORT not set
+    app.run(host="0.0.0.0", port=port)
