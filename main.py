@@ -17,8 +17,8 @@ twilio_phone_number = str(environ.get("TWILIO_NUM"))  # Twilio phone number
 destination_number = str(environ.get("SEND_NUM"))  #The number to send the SOS
 
 @app.route('/')
-def home():
-    return render_template('index.html')
+def hello():
+    return 'Hello, World!'
 
 
                          
