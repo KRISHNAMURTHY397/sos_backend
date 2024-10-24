@@ -14,16 +14,13 @@ CORS(app)  # Enable CORS for the Flask app
 account_sid = str(environ.get("ACCOUNT_ID"))  # Your Twilio Account SID
 auth_token = str(environ.get("AUTH_ID"))     # Your Twilio Auth Token
 twilio_phone_number = str(environ.get("TWILIO_NUM"))  # Twilio phone number
-destination_number = str(environ.get("SEND_NUM"))  #The number to send the SOS
 
 @app.route('/')
 def hello():
     return 'Hello, World!'
 
-
-                         
 # Function to send SMS via Twilio
-def send_sms(location, message):
+def send_sms(destination_number, location, message):
     client = Client(account_sid, auth_token)
     try:
         client.messages.create(
@@ -40,6 +37,10 @@ def send_sms(location, message):
 def send_sos():
     data = request.json
     message = data.get('message', 'Emergency SOS')  # Default message if not provided
+    destination_number = data.get('phone_number')  # Get destination number from request
+
+    if not destination_number:
+        return jsonify({'status': 'error', 'message': 'Phone number is required'}), 400
 
     # Get the location (use GPS data from Flutter, fallback to IP geolocation for testing)
     location = data.get('location', None)
@@ -48,7 +49,7 @@ def send_sos():
         location = g.latlng if g else 'Unknown Location'
 
     # Send the SMS message
-    if send_sms(location, message):
+    if send_sms(destination_number, location, message):
         return jsonify({'status': 'success', 'message': 'SOS sent successfully!'}), 200
     else:
         return jsonify({'status': 'error', 'message': 'Failed to send SOS'}), 500
