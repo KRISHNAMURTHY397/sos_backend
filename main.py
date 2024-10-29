@@ -22,9 +22,13 @@ db_config = {
     'host': "localhost",
     'user': "root",
     'password': "sarankrishna123",
-    'database': "sos_feed",
+    'database': "class_56",
     'port': 3306
 }
+
+# Function to connect to the database
+def connect_db():
+    return mysql.connector.connect(**db_config)
 
 # Function to send SMS via Twilio
 def send_sms(location, message):
@@ -73,7 +77,7 @@ def submit_feedback():
 
     try:
         # Connect to the MySQL database
-        conn = mysql.connector.connect(**db_config)
+        conn = connect_db()
         cursor = conn.cursor()
 
         # Insert feedback data into the database
@@ -85,8 +89,52 @@ def submit_feedback():
         
         return jsonify({'status': 'success', 'message': 'Feedback submitted successfully'}), 200
     except mysql.connector.Error as err:
-        print("Database Error:", err)
-        return jsonify({'status': 'error', 'message': 'Failed to submit feedback'}), 500
+        print("Database Error:", err)  # Log the exact error
+        return jsonify({'status': 'error', 'message': str(err)}), 500
+
+# Save function to insert data into the database
+@app.route('/save_data', methods=['POST'])
+def save_data():
+    data = request.json
+    name = data.get('name')
+
+    if not name:
+        return jsonify({'status': 'error', 'message': 'Please fill in the name field'}), 400
+
+    try:
+        db = connect_db()
+        cursor = db.cursor()
+        cursor.execute(
+            "INSERT INTO feed (name) VALUES (%s)",
+            (name,)
+        )
+        db.commit()
+        cursor.close()
+        db.close()
+        return jsonify({'status': 'success', 'message': 'Data saved successfully!'}), 200
+    except mysql.connector.Error as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+# New endpoint to retrieve saved data
+@app.route('/show_data', methods=['GET'])
+def show_data():
+    try:
+        db = connect_db()
+        cursor = db.cursor()
+        cursor.execute("SELECT * FROM feed")
+        records = cursor.fetchall()
+        cursor.close()
+        db.close()
+
+        data = []
+        for record in records:
+            data.append({
+                'name': record[1]
+            })
+
+        return jsonify({'status': 'success', 'data': data}), 200
+    except mysql.connector.Error as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 if __name__ == "__main__":
     port = int(environ.get("PORT", 8080))  # Default to 8080 if PORT not set
